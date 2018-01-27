@@ -1,6 +1,6 @@
-Feature: Tests covering the Currency API.
+Feature: Tests covering the Currency API. (the currency data is supplied when the application is bootstrapped on start-up)
 
-  Scenario: Should provide all the available currencies for the kinitic shop. ({id} field in data table will be populated in the step definition's assertion)
+  Scenario: Should provide all the available currencies for the kinitic shop.
     Given I invoke the Currencies Api endpoint
     Then the response is 200
     And the response contains the following Currency entries:
