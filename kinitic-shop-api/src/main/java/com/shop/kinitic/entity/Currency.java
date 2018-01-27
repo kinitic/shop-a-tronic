@@ -14,6 +14,9 @@ public class Currency {
     private String name;
     private String description;
 
+    public Currency() { // for JPA
+    }
+
     public Currency(String name, String description) {
         this.name = name;
         this.description = description;

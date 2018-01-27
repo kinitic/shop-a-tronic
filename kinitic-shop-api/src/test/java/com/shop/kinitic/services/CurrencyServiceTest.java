@@ -2,6 +2,7 @@ package com.shop.kinitic.services;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,7 +32,7 @@ public class CurrencyServiceTest {
 
         when(currencyRepository.findAll()).thenReturn(asList(gbpCurrency, usdCurrency, swissCurrency));
 
-        assertThat(currencyService.getCurrencies(), notNullValue());
+        assertThat(currencyService.getCurrencies(), hasSize(3));
         
         verify(currencyRepository).findAll();
     }
