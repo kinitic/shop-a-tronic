@@ -2,6 +2,7 @@ package com.shop.kinitic.resources;
 
 import java.util.List;
 
+import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.services.CurrencyService;
 import com.shop.kinitic.views.CurrencyView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class CurrencyResource {
 
     @RequestMapping(method = RequestMethod.GET, path = "currencies")
     public CurrencyView getCurrencies() {
-        final List<String> currencies = currencyService.getCurrencies();
+        final List<Currency> currencies = currencyService.getCurrencies();
         return new CurrencyView(currencies);
     }
 }
