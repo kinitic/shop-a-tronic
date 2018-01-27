@@ -3,6 +3,7 @@ package com.shop.kinitic.resources;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,5 +39,20 @@ public class CurrencyResourceTest {
         assertThat(view.getCurrencies(), containsInAnyOrder(gbpCurrency, usdCurrency, swissCurrency));
 
         verify(currencyService).getCurrencies();
+    }
+
+    @Test
+    public void shouldReturnEmptyListOffers_whenInvokingGetOffers_WithNullAsCurrencyName() throws Exception {
+        assertThat(currencyResource.getOffers(null), empty());
+    }
+
+    @Test
+    public void shouldReturnEmptyListOffers_whenInvokingGetOffers_WithUnknownCurrencyName() throws Exception {
+        assertThat(currencyResource.getOffers("whatever"), empty());
+    }
+
+    @Test
+    public void shouldReturnListOfAllOffersForAGivenCurrency_whenInvokingGetOffers() throws Exception {
+        
     }
 }
