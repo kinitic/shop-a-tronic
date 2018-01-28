@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.Collections;
 
@@ -28,12 +29,18 @@ import com.shop.kinitic.views.CurrenciesView;
 import com.shop.kinitic.views.CurrencyView;
 import com.shop.kinitic.views.ExpiredOfferView;
 import com.shop.kinitic.views.OfferView;
+import com.sun.jndi.toolkit.url.Uri;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CurrencyResourceTest {
@@ -127,6 +134,22 @@ public class CurrencyResourceTest {
 
     @Test
     public void shouldAddOffer_whenPostingNewOfferToAnExistingCurrency() {
+        final Currency currency = mock(Currency.class);
+        final Offer offer = new Offer("new offer", "new category", of(2015, 1, 1), of(2020, 1, 1), valueOf(12.00));
 
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpSession session = new MockHttpSession();
+        request.setSession(session);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        when(currencyService.findCurrencyBy(123L)).thenReturn(currency);
+
+        final long offerId = 101L;
+        when(offerService.addOffer(currency, offer)).thenReturn(offerId); // returns the offer id for the newly added offer
+
+        final ResponseEntity responseEntity = currencyResource.addOffer(123L, offer);
+
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(responseEntity.getHeaders().get("location").get(0), is(String.format("http://localhost/%d", offerId)));   // uses the offer id in the location
     }
 }

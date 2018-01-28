@@ -72,6 +72,13 @@ public class CurrencyResource {
         if (currency == null) {
             return noContent().build();
         }
-        return null;
+
+        final Long offerId = offerService.addOffer(currency, offer);
+
+        URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(offerId).toUri();
+
+        return ResponseEntity.created(location).build();
     }
 }

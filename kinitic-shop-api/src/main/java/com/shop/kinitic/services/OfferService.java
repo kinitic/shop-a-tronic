@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.entity.OfferDetails;
+import com.shop.kinitic.model.Offer;
 import com.shop.kinitic.repository.OfferRepository;
 import com.shop.kinitic.resources.OffersView;
 import com.shop.kinitic.views.ActiveOfferView;
@@ -55,5 +56,9 @@ public class OfferService {
         final OfferDetails offerDetails = offerRepository.findByCurrencyAndId(currency, offerId);
 
         return new OfferView(offerDetails, currency.getId());
+    }
+
+    public Long addOffer(final Currency currency, final Offer offer) {
+        return 0L;
     }
 }
