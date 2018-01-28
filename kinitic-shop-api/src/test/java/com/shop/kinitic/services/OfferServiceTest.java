@@ -21,6 +21,7 @@ import java.util.List;
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.entity.OfferDetails;
 import com.shop.kinitic.repository.OfferRepository;
+import com.shop.kinitic.resources.OffersView;
 import com.shop.kinitic.views.OfferView;
 import org.junit.After;
 import org.junit.Test;
@@ -47,27 +48,28 @@ public class OfferServiceTest {
     public void shouldReturnEmptyListForCurrency_thatHasNoAssociatedOffers() {
         when(offerRepository.findByCurrency(any(Currency.class))).thenReturn(emptyList());
 
-        assertThat(offerService.getAllOffersFor(new Currency("GBP", "British Pounds")), empty());
+        final OffersView offersView = offerService.getAllOffersFor(new Currency("GBP", "British Pounds"));
+        
+        assertThat(offersView.getName(), is("GBP"));
+        assertThat(offersView.getActiveOffers(), empty());
+        assertThat(offersView.getExpiredOffers(), empty());
 
         verify(offerRepository).findByCurrency(currencyArgumentCaptor.capture());
         verifyCurrencyInvocations();
     }
 
     @Test
-    public void shouldReturnAllOffersFoundForASpecificCurrency() {
+    public void shouldReturnAllOffersFoundForASpecificCurrency_andGroupByActiveAndExpiredOffers() {
         final Currency currency = new Currency("GBP", "British Pounds");
-        final OfferDetails offerDetails = new OfferDetails(currency, "offerName", "category", LocalDate.now(), LocalDate.now().plusDays(3), BigDecimal.valueOf(2.99));
+        final OfferDetails offerDetails = new OfferDetails(currency, "offerName", "category", LocalDate.now().minusDays(2), LocalDate.now().plusDays(3), BigDecimal.valueOf(2.99));
 
         when(offerRepository.findByCurrency(any(Currency.class))).thenReturn(singletonList(offerDetails));
 
-        final List<OfferView> offersView = offerService.getAllOffersFor(currency);
+        final OffersView offersView = offerService.getAllOffersFor(currency);
 
-        assertThat(offersView, hasSize(1));
-        assertThat(offersView.get(0).getName(), is("offerName"));
-        assertThat(offersView.get(0).getCategory(), is("category"));
-        assertThat(offersView.get(0).getStartDate(), notNullValue());
-        assertThat(offersView.get(0).getEndDate(), notNullValue());
-        assertThat(offersView.get(0).getPrice(), is(BigDecimal.valueOf(2.99)));
+        assertThat(offersView.getName(), is("GBP"));
+        assertThat(offersView.getActiveOffers(), hasSize(1));
+        assertThat(offersView.getExpiredOffers(), empty());
 
         verify(offerRepository).findByCurrency(currencyArgumentCaptor.capture());
         verifyCurrencyInvocations();

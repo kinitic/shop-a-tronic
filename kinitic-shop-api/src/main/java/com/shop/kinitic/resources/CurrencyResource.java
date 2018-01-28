@@ -42,9 +42,7 @@ public class CurrencyResource {
             throw new CurrencyNotFoundException(currencyId);
         }
 
-        final List<OfferView> offers = offerService.getAllOffersFor(currency);
-
-        return new OffersView(currency.getName(), offers);
+        return offerService.getAllOffersFor(currency);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/{currencyId}/offers/{offerId}")

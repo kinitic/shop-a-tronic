@@ -30,11 +30,16 @@ public class ShopApplication {
         currencyRepository.save(gbpCurrency);
         currencyRepository.save(usdCurrency);
 
+        // active ones
         final OfferDetails toys = new OfferDetails(gbpCurrency, "Cuddly Toy", "Toys", LocalDate.of(2017, 12, 10), LocalDate.of(2020, 12, 10), BigDecimal.valueOf(10.99));
         final OfferDetails electricals = new OfferDetails(gbpCurrency, "Toaster", "Electricals", LocalDate.of(2018, 1, 26), LocalDate.of(2020, 1, 26), BigDecimal.valueOf(12.95));
         final OfferDetails books = new OfferDetails(gbpCurrency, "Effective Java", "Books", LocalDate.of(2016, 1, 10), LocalDate.of(2020, 12, 22), BigDecimal.valueOf(29.99));
 
-        return (evt) -> asList(toys, electricals, books).forEach(
+        // expired ones
+        final OfferDetails groceries = new OfferDetails(gbpCurrency, "Sandwich", "Groceries", LocalDate.of(2017, 12, 10), LocalDate.of(2017, 12, 31), BigDecimal.valueOf(1.99));
+        final OfferDetails car = new OfferDetails(gbpCurrency, "VW Golf", "Car", LocalDate.of(2016, 1, 26), LocalDate.of(2018, 1, 10), BigDecimal.valueOf(20000.95));
+
+        return (evt) -> asList(toys, electricals, books, groceries, car).forEach(
                 offer -> offerRepository.save(offer)
         );
     }
