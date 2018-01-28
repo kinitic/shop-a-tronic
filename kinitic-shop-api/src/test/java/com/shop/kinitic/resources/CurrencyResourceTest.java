@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.entity.OfferDetails;
+import com.shop.kinitic.model.Offer;
 import com.shop.kinitic.services.CurrencyService;
 import com.shop.kinitic.services.OfferService;
 import com.shop.kinitic.views.ActiveOfferView;
@@ -32,6 +33,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.ResponseEntity;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CurrencyResourceTest {
@@ -109,5 +111,22 @@ public class CurrencyResourceTest {
 
         verify(currencyService).findCurrencyBy(eq(1L));
         verify(offerService).getOfferFor(eq(currency), eq(123L));
+    }
+
+    @Test
+    public void shouldNotAddOffer_whenPostingNewOfferToAnUnknownCurrency() {
+        final long unknownCurrencyId = 123L;
+
+        when(currencyService.findCurrencyBy(unknownCurrencyId)).thenReturn(null);
+
+        final ResponseEntity responseEntity = currencyResource.addOffer(unknownCurrencyId, new Offer("new offer", "new category", of(2015, 1, 1), of(2020, 1, 1), valueOf(12.00)));
+
+        assertThat(responseEntity, is(ResponseEntity.noContent().build()));
+        verify(currencyService).findCurrencyBy(eq(unknownCurrencyId));
+    }
+
+    @Test
+    public void shouldAddOffer_whenPostingNewOfferToAnExistingCurrency() {
+
     }
 }
