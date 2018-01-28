@@ -9,7 +9,6 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.withJsonPath;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static javax.json.Json.createObjectBuilder;
 import static javax.ws.rs.client.ClientBuilder.newClient;
 import static javax.ws.rs.client.Entity.json;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,23 +18,15 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
-import com.shop.kinitic.acceptance.model.Offer;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -133,7 +124,7 @@ public class KiniticShopStepdefs {
                             withJsonPath(compile("$." + offerStatus + "Offers[?].name", currencyFilter), hasItem(expectedOfferDetailsMap.get("name"))),
                             withJsonPath(compile("$." + offerStatus + "Offers[?].category", currencyFilter), hasItem(expectedOfferDetailsMap.get("category"))),
                             withJsonPath(compile("$." + offerStatus + "Offers[?].startDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("startDate"))),
-                            withJsonPath(compile("$." + offerStatus + "Offers[?].endDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("endDate"))),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].expiryDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("expiryDate"))),
                             withJsonPath(compile("$." + offerStatus + "Offers[?].price", currencyFilter), notNullValue()),  // TODO: fix this assertion.
                             withJsonPath(compile("$." + offerStatus + "Offers[?].link", currencyFilter), hasItem(expectedOfferDetailsMap.get("link")))
                     )));
@@ -151,7 +142,7 @@ public class KiniticShopStepdefs {
                 withJsonPath("$.name", is(expectedOffer.get("name"))),
                 withJsonPath("$.category", is(expectedOffer.get("category"))),
                 withJsonPath("$.startDate", is(expectedOffer.get("startDate"))),
-                withJsonPath("$.endDate", is(expectedOffer.get("endDate"))),
+                withJsonPath("$.expiryDate", is(expectedOffer.get("expiryDate"))),
                 withJsonPath("$.price", notNullValue()),  // TODO: fix this assertion.
                 withJsonPath("$.link", is(expectedOffer.get("link"))))
         ));

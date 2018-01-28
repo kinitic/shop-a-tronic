@@ -17,7 +17,7 @@ public class OfferView {
     private final String name;
     private final String category;
     private final String startDate;
-    private final String endDate;
+    private final String expiryDate;
     private final BigDecimal price;
     private final String link;
 
@@ -26,7 +26,7 @@ public class OfferView {
         this.name = offer.getName();
         this.category = offer.getCategory();
         this.startDate = offer.getStartDate().format(DateTimeFormatter.ofPattern(DATE_PATTERN));
-        this.endDate = offer.getExpiryDate().format(DateTimeFormatter.ofPattern(DATE_PATTERN));
+        this.expiryDate = offer.getExpiryDate().format(DateTimeFormatter.ofPattern(DATE_PATTERN));
         this.price = offer.getPrice();
         this.link = format(KINITIC_BASE_OFFER_URL, currencyId, offer.getId());
     }
@@ -47,8 +47,8 @@ public class OfferView {
         return startDate;
     }
 
-    public String getEndDate() {
-        return endDate;
+    public String getExpiryDate() {
+        return expiryDate;
     }
 
     public BigDecimal getPrice() {
