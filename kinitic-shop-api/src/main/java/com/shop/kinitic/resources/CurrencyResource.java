@@ -1,12 +1,11 @@
 package com.shop.kinitic.resources;
 
-import static java.lang.String.format;
-
 import java.util.List;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.services.CurrencyService;
 import com.shop.kinitic.services.OfferService;
+import com.shop.kinitic.views.CurrenciesView;
 import com.shop.kinitic.views.CurrencyView;
 import com.shop.kinitic.views.OfferView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,10 @@ public class CurrencyResource {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public CurrencyView getCurrencies() {
-        final List<Currency> currencies = currencyService.getCurrencies();
-        return new CurrencyView(currencies);
+    public CurrenciesView getCurrencies() {
+        final List<CurrencyView> currencies = currencyService.getCurrencies();
+
+        return new CurrenciesView(currencies);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/{currencyId}/offers")

@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +18,7 @@ import java.util.List;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.repository.CurrencyRepository;
+import com.shop.kinitic.views.CurrencyView;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,19 +35,33 @@ public class CurrencyServiceTest {
     private CurrencyRepository currencyRepository;
 
     @Test
-    public void shouldReturnAllAvailableCurrencies_whenCallingGetCurrencies() {
-        final Currency gbpCurrency = new Currency("GBP", "Pounds Stering");
-        final Currency usdCurrency = new Currency("USD", "US Dollars");
-        final Currency swissCurrency = new Currency("SFr", "Swiss Franc");
+    public void shouldReturnAllAvailableCurrenciesInTheListView_whenCallingGetCurrencies() {
+        final Currency gbpCurrency = mock(Currency.class);
+        final Currency usdCurrency = mock(Currency.class);
 
-        when(currencyRepository.findAll()).thenReturn(asList(gbpCurrency, usdCurrency, swissCurrency));
+        when(currencyRepository.findAll()).thenReturn(asList(gbpCurrency, usdCurrency));
 
-        final List<Currency> currencies = currencyService.getCurrencies();
+        final List<CurrencyView> currenciesView = currencyService.getCurrencies();
+        when(gbpCurrency.getName()).thenReturn("GBP");
+        when(gbpCurrency.getDescription()).thenReturn("British pounds");
+        when(gbpCurrency.getId()).thenReturn(123L);
 
-        assertThat(currencies, hasSize(3));
-        assertThat(currencies, containsInAnyOrder(gbpCurrency, usdCurrency, swissCurrency));
-        
+        when(usdCurrency.getName()).thenReturn("USD");
+        when(usdCurrency.getDescription()).thenReturn("US dollars");
+        when(usdCurrency.getId()).thenReturn(987L);
+
+        assertThat(currenciesView, hasSize(2));
+
+        // TODO: add custom matcher to assert on the views themselves
         verify(currencyRepository).findAll();
+
+        verify(gbpCurrency).getName();
+        verify(gbpCurrency).getDescription();
+        verify(gbpCurrency, times(2)).getId();
+        
+        verify(usdCurrency).getName();
+        verify(usdCurrency).getDescription();
+        verify(usdCurrency, times(2)).getId();
     }
 
     @Test

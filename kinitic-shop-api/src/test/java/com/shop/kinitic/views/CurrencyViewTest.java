@@ -1,12 +1,9 @@
 package com.shop.kinitic.views;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-
-import java.util.List;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.shop.kinitic.entity.Currency;
 import org.junit.Test;
@@ -14,29 +11,17 @@ import org.junit.Test;
 public class CurrencyViewTest {
     
     @Test
-    public void shouldReturnAllAvailableCurrenciesInView() throws Exception {
-        Currency currency1 = new Currency("currency 1", "I am the first currency");
-        Currency currency2 = new Currency("currency 2", "I am the second currency");
-        Currency currency3 = new Currency("currency 3", "I am the third currency");
+    public void shouldReturnCorrectlyFormattedCurrencyLink() throws Exception {
+        Currency currency = mock(Currency.class);
+        when(currency.getName()).thenReturn("GBP");
+        when(currency.getDescription()).thenReturn("this is Pounds");
+        when(currency.getId()).thenReturn(123L);
 
-        final List<Currency> currencies = asList(currency1, currency2, currency3);
+        final CurrencyView currencyView = new CurrencyView(currency);
 
-        final CurrencyView currencyView = new CurrencyView(currencies);
-
-        final List<CurrencyView.CurrencyDetails> currencyDetails = currencyView.getCurrencies();
-        assertThat(currencyDetails, hasSize(3));
-
-        // TODO: add more assertions with custom type matcher
-        // but for now will have assertions for the correct link generation using the auto-generated id in the cukes
-    }
-
-    @Test
-    public void shouldReturnEmptyListIfCurrenciesPassedInIsNull() throws Exception {
-        assertThat(new CurrencyView(null).getCurrencies(), empty());
-    }
-
-    @Test
-    public void shouldReturnEmptyListIfCurrenciesIsEmptyList() throws Exception {
-        assertThat(new CurrencyView(emptyList()).getCurrencies(), empty());
+        assertThat(currencyView.getName(), is("GBP"));
+        assertThat(currencyView.getDescription(), is("this is Pounds"));
+        assertThat(currencyView.getId(), is(123L));
+        assertThat(currencyView.getLink(), is("http://localhost:8080/kinitic-shop/currencies/123/offers"));   // embeds the id into the link url
     }
 }

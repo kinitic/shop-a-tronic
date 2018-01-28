@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.services.CurrencyService;
 import com.shop.kinitic.services.OfferService;
+import com.shop.kinitic.views.CurrenciesView;
 import com.shop.kinitic.views.CurrencyView;
 import com.shop.kinitic.views.OfferView;
 import org.junit.Test;
@@ -37,14 +39,14 @@ public class CurrencyResourceTest {
 
     @Test
     public void shouldReturnListOfAllAvailableCurrencies_whenInvokingGetCurrencies() throws Exception {
-        final Currency gbpCurrency = new Currency("GBP", "Pounds Stering");
-        final Currency usdCurrency = new Currency("USD", "US Dollars");
-        final Currency swissCurrency = new Currency("SFr", "Swiss Franc");
+        final CurrencyView gbpCurrency = mock(CurrencyView.class);
+        final CurrencyView usdCurrency = mock(CurrencyView.class);
+        final CurrencyView swissCurrency = mock(CurrencyView.class);
 
         when(currencyService.getCurrencies()).thenReturn(asList(gbpCurrency, usdCurrency, swissCurrency));
-        final CurrencyView view = currencyResource.getCurrencies();
+        final CurrenciesView currencies = currencyResource.getCurrencies();
 
-        assertThat(view.getCurrencies(), hasSize(3));
+        assertThat(currencies.getCurrencies(), hasSize(3));
 
         verify(currencyService).getCurrencies();
     }
