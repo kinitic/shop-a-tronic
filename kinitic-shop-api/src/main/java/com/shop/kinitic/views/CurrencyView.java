@@ -9,7 +9,7 @@ import com.shop.kinitic.entity.Currency;
 
 public class CurrencyView {
 
-    private static final String KINITIC_BASE_URL = "http://localhost:8080/kinitic-shop/currency/%d/offers";
+    private static final String KINITIC_BASE_URL = "http://localhost:8080/kinitic-shop/currencies/%d/offers";
 
     private List<CurrencyDetails> currencies;
 

@@ -19,4 +19,8 @@ public class CurrencyService {
     public List<Currency> getCurrencies() {
         return currencyRepository.findAll();
     }
+
+    public Currency findCurrencyBy(final Long currencyId) {
+        return currencyRepository.findById(currencyId);
+    }
 }

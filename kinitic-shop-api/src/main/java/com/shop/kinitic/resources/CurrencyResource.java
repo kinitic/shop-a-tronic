@@ -1,13 +1,12 @@
 package com.shop.kinitic.resources;
 
-import static java.util.Collections.emptyList;
+import static java.lang.String.format;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.services.CurrencyService;
+import com.shop.kinitic.services.OfferService;
 import com.shop.kinitic.views.CurrencyView;
 import com.shop.kinitic.views.OfferView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,24 +16,34 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/kinitic-shop")
+@RequestMapping("/kinitic-shop/currencies")
 public class CurrencyResource {
 
     private CurrencyService currencyService;
+    private OfferService offerService;
 
     @Autowired
-    public CurrencyResource(final CurrencyService currencyService) {
+    public CurrencyResource(final CurrencyService currencyService, final OfferService offerService) {
         this.currencyService = currencyService;
+        this.offerService = offerService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "currencies")
+    @RequestMapping(method = RequestMethod.GET)
     public CurrencyView getCurrencies() {
         final List<Currency> currencies = currencyService.getCurrencies();
         return new CurrencyView(currencies);
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "currencies/{currencyId}/offers")
-    public List<OfferView> getOffers(@PathVariable final String currencyId) {
-        return emptyList();
+    @RequestMapping(method = RequestMethod.GET, path = "/{currencyId}/offers")
+    public OffersView getOffers(@PathVariable final Long currencyId) {
+
+        final Currency currency = currencyService.findCurrencyBy(currencyId);
+        if (currency == null) {
+            throw new CurrencyNotFoundException(currencyId);
+        }
+        
+        final List<OfferView> offers = offerService.getAllOffersFor(currency);
+
+        return new OffersView(currency.getName(), offers);
     }
 }
