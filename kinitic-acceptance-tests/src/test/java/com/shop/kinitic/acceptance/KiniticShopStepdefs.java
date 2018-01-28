@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -78,14 +79,22 @@ public class KiniticShopStepdefs {
 
     @When("^I click the '(.+)' offers link$")
     public void iClickTheGBPOffersLink(final String currencyName) throws Throwable {
-        Filter currencyFilter = filter(where("name").is(currencyName));
+        final Filter currencyFilter = filter(where("name").is(currencyName));
 
         final JSONArray jsonArray = JsonPath.read(responseBody, "$.currencies[?].link", currencyFilter);
         final String[] linksArray = jsonArray.toArray(new String[jsonArray.size()]);     // should only be 1 link matched via the filter
 
         readResponse(newClient().target(linksArray[0]).request().get());
+    }
 
+    @When("^I click '(.+)' offer link$")
+    public void iClickCuddlyToyOfferLink(final String offerName) throws Throwable {
+        final Filter offerFilter = filter(where("name").is(offerName));
 
+        final JSONArray jsonArray = JsonPath.read(responseBody, "$.offers[?].link", offerFilter);
+        final String[] linksArray = jsonArray.toArray(new String[jsonArray.size()]);     // should only be 1 link matched via the filter
+
+        readResponse(newClient().target(linksArray[0]).request().get());
     }
 
     @Then("^I should see the following offer entries for '(.+)':$")
@@ -111,14 +120,32 @@ public class KiniticShopStepdefs {
 
                     assertThat(responseBody, isJson(allOf(
                             withJsonPath(compile("$.offers[?]", currencyFilter), hasSize(1)),
+                            withJsonPath(compile("$.offers[?].id", currencyFilter), hasItem(parseInt(expectedOfferDetailsMap.get("id")))),
                             withJsonPath(compile("$.offers[?].name", currencyFilter), hasItem(expectedOfferDetailsMap.get("name"))),
                             withJsonPath(compile("$.offers[?].category", currencyFilter), hasItem(expectedOfferDetailsMap.get("category"))),
                             withJsonPath(compile("$.offers[?].startDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("startDate"))),
                             withJsonPath(compile("$.offers[?].endDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("endDate"))),
-                            withJsonPath(compile("$.offers[?].price", currencyFilter), notNullValue()))  // TODO: fix this assertion.
-                    ));
+                            withJsonPath(compile("$.offers[?].price", currencyFilter), notNullValue()),  // TODO: fix this assertion.
+                            withJsonPath(compile("$.offers[?].link", currencyFilter), hasItem(expectedOfferDetailsMap.get("link")))
+                    )));
                 }
         );
+    }
+
+    @And("^I should see the following offer:$")
+    public void iShouldSeeTheFollowingOffer(final DataTable dataTable) throws Throwable {
+
+        final Map<String, String> expectedOffer = dataTable.asMaps().get(0); // a little cheat, since we know there is only one expected row
+
+        assertThat(responseBody, isJson(allOf(
+                withJsonPath("$.id", is(parseInt(expectedOffer.get("id")))),
+                withJsonPath("$.name", is(expectedOffer.get("name"))),
+                withJsonPath("$.category", is(expectedOffer.get("category"))),
+                withJsonPath("$.startDate", is(expectedOffer.get("startDate"))),
+                withJsonPath("$.endDate", is(expectedOffer.get("endDate"))),
+                withJsonPath("$.price", notNullValue()),  // TODO: fix this assertion.
+                withJsonPath("$.link", is(expectedOffer.get("link"))))
+        ));
     }
 
     private void readResponse(Response response) {
