@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.shop.kinitic.entity.Currency;
+import com.shop.kinitic.entity.OfferDetails;
 import com.shop.kinitic.services.CurrencyService;
 import com.shop.kinitic.services.OfferService;
 import com.shop.kinitic.views.CurrenciesView;
@@ -67,9 +68,9 @@ public class CurrencyResourceTest {
 
         when(currencyService.findCurrencyBy(1L)).thenReturn(currency);
 
-        OfferView offer1 = new OfferView("name1", "category1", LocalDate.of(2018, 1, 1), LocalDate.of(2020, 1, 1), BigDecimal.valueOf(10.99));
-        OfferView offer2 = new OfferView("name2", "category2", LocalDate.of(2017, 11, 21), LocalDate.of(2020, 1, 1), BigDecimal.valueOf(1.99));
-        OfferView offer3 = new OfferView("name3", "category3", LocalDate.of(2016, 4, 11), LocalDate.of(2020, 1, 1), BigDecimal.valueOf(5.99));
+        OfferView offer1 = new OfferView(new OfferDetails(currency, "name1", "category1", LocalDate.of(2018, 1, 1), LocalDate.of(2020, 1, 1), BigDecimal.valueOf(10.99)), currency.getId());
+        OfferView offer2 = new OfferView(new OfferDetails(currency, "name2", "category2", LocalDate.of(2017, 11, 21), LocalDate.of(2020, 1, 1), BigDecimal.valueOf(1.99)), currency.getId());
+        OfferView offer3 = new OfferView(new OfferDetails(currency, "name3", "category3", LocalDate.of(2016, 4, 11), LocalDate.of(2020, 1, 1), BigDecimal.valueOf(5.99)), currency.getId());
         
         when(offerService.getAllOffersFor(currency)).thenReturn(asList(offer1, offer2, offer3));
 

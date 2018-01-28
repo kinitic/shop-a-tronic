@@ -25,7 +25,7 @@ public class OfferService {
         final List<OfferDetails> offers = offerRepository.findByCurrency(currency);
 
         return offers.stream()
-                .map(offer -> new OfferView(offer.getName(), offer.getCategory(), offer.getStartDate(), offer.getExpiryDate(), offer.getPrice()))
+                .map(offer -> new OfferView(offer, currency.getId()))
                 .collect(toList());
     }
 }

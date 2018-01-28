@@ -7,9 +7,13 @@ import static org.mockito.Mockito.when;
 
 import com.shop.kinitic.entity.Currency;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 public class CurrencyViewTest {
-    
+
     @Test
     public void shouldReturnCorrectlyFormattedCurrencyLink() throws Exception {
         Currency currency = mock(Currency.class);
