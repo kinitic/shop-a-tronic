@@ -1,5 +1,6 @@
 package com.shop.kinitic.services;
 
+import static java.math.BigDecimal.valueOf;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.entity.OfferDetails;
+import com.shop.kinitic.model.Offer;
 import com.shop.kinitic.repository.OfferRepository;
 import com.shop.kinitic.resources.OffersView;
 import com.shop.kinitic.views.OfferView;
@@ -61,7 +63,7 @@ public class OfferServiceTest {
     @Test
     public void shouldReturnAllOffersFoundForASpecificCurrency_andGroupByActiveAndExpiredOffers() {
         final Currency currency = new Currency("GBP", "British Pounds");
-        final OfferDetails offerDetails = new OfferDetails(currency, "offerName", "category", LocalDate.now().minusDays(2), LocalDate.now().plusDays(3), BigDecimal.valueOf(2.99));
+        final OfferDetails offerDetails = new OfferDetails(currency, "offerName", "category", LocalDate.now().minusDays(2), LocalDate.now().plusDays(3), valueOf(2.99));
 
         when(offerRepository.findByCurrency(any(Currency.class))).thenReturn(singletonList(offerDetails));
 
@@ -89,7 +91,7 @@ public class OfferServiceTest {
         when(offerDetails.getCategory()).thenReturn("category");
         when(offerDetails.getStartDate()).thenReturn(LocalDate.of(2016, 1, 1));
         when(offerDetails.getExpiryDate()).thenReturn(LocalDate.of(2017, 1, 1));
-        when(offerDetails.getPrice()).thenReturn(BigDecimal.valueOf(12.99));
+        when(offerDetails.getPrice()).thenReturn(valueOf(12.99));
 
         final OfferView offerView = offerService.getOfferFor(currency, 123L);
 
@@ -97,6 +99,22 @@ public class OfferServiceTest {
         
         verify(offerRepository).findByCurrencyAndId(any(Currency.class), eq(123L));
         verifyOfferDetails(offerDetails);
+    }
+
+    @Test
+    public void shouldReturnOfferIdOfTheNewlySavedOffer() {
+        final Currency currency = new Currency("GBP", "British Pounds");
+        final Offer offer = new Offer("offerName", "category", "2012-01-01", "2020-01-01", valueOf(2.99));
+
+        final OfferDetails offerDetails = mock(OfferDetails.class);
+
+        when(offerRepository.save(any(OfferDetails.class))).thenReturn(offerDetails);
+        when(offerDetails.getId()).thenReturn(123L);
+
+        assertThat(offerService.addOffer(currency, offer), is(123L)); // should return the new offer id from the save call
+
+        verify(offerDetails).getId();
+        verify(offerRepository).save(any(OfferDetails.class));
     }
 
     private void verifyOfferDetails(OfferDetails offerDetails) {

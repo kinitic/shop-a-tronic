@@ -1,5 +1,7 @@
 package com.shop.kinitic.services;
 
+import static java.time.LocalDate.parse;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OfferService {
+
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
 
     private final OfferRepository offerRepository;
 
@@ -59,6 +63,13 @@ public class OfferService {
     }
 
     public Long addOffer(final Currency currency, final Offer offer) {
-        return 0L;
+        final OfferDetails offerDetails = new OfferDetails(currency, offer.getName(),
+                offer.getCategory(), formatDate(offer.getStartDate()), formatDate(offer.getExpiryDate()), offer.getPrice());
+
+        return offerRepository.save(offerDetails).getId();
+    }
+
+    private LocalDate formatDate(final String date) {
+        return parse(date, ofPattern(DATE_PATTERN));
     }
 }

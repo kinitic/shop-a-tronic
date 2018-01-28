@@ -1,21 +1,23 @@
 package com.shop.kinitic.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class Offer {
     
-    private final String name;
-    private final String category;
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final BigDecimal price;
+    private String name;
+    private String category;
+    private String startDate;
+    private String expiryDate;
+    private BigDecimal price;
 
-    public Offer(final String name, final String category, final LocalDate startDate, final LocalDate endDate, final BigDecimal price) {
+    public Offer() { // for de/serialisation
+    }
+
+    public Offer(final String name, final String category, final String startDate, final String expiryDate, final BigDecimal price) {
         this.name = name;
         this.category = category;
         this.startDate = startDate;
-        this.endDate = endDate;
+        this.expiryDate = expiryDate;
         this.price = price;
     }
 
@@ -27,12 +29,12 @@ public class Offer {
         return category;
     }
 
-    public LocalDate getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public String getExpiryDate() {
+        return expiryDate;
     }
 
     public BigDecimal getPrice() {

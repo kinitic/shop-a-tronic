@@ -1,5 +1,6 @@
 package com.shop.kinitic.resources;
 
+import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
 
 import java.net.URI;
@@ -75,10 +76,10 @@ public class CurrencyResource {
 
         final Long offerId = offerService.addOffer(currency, offer);
 
-        URI location = ServletUriComponentsBuilder
+        final URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{id}")
                     .buildAndExpand(offerId).toUri();
 
-        return ResponseEntity.created(location).build();
+        return created(location).build();
     }
 }

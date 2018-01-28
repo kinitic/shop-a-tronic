@@ -1,5 +1,6 @@
 package com.shop.kinitic.resources;
 
+import static java.lang.String.format;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static java.util.Arrays.asList;
@@ -126,7 +127,7 @@ public class CurrencyResourceTest {
 
         when(currencyService.findCurrencyBy(unknownCurrencyId)).thenReturn(null);
 
-        final ResponseEntity responseEntity = currencyResource.addOffer(unknownCurrencyId, new Offer("new offer", "new category", of(2015, 1, 1), of(2020, 1, 1), valueOf(12.00)));
+        final ResponseEntity responseEntity = currencyResource.addOffer(unknownCurrencyId, new Offer("new offer", "new category", "2015-01-01", "2020-01-02", valueOf(12.00)));
 
         assertThat(responseEntity, is(ResponseEntity.noContent().build()));
         verify(currencyService).findCurrencyBy(eq(unknownCurrencyId));
@@ -135,7 +136,7 @@ public class CurrencyResourceTest {
     @Test
     public void shouldAddOffer_whenPostingNewOfferToAnExistingCurrency() {
         final Currency currency = mock(Currency.class);
-        final Offer offer = new Offer("new offer", "new category", of(2015, 1, 1), of(2020, 1, 1), valueOf(12.00));
+        final Offer offer = new Offer("new offer", "new category", "2015-01-01", "2020-01-02", valueOf(12.00));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpSession session = new MockHttpSession();
@@ -150,6 +151,6 @@ public class CurrencyResourceTest {
         final ResponseEntity responseEntity = currencyResource.addOffer(123L, offer);
 
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.CREATED));
-        assertThat(responseEntity.getHeaders().get("location").get(0), is(String.format("http://localhost/%d", offerId)));   // uses the offer id in the location
+        assertThat(responseEntity.getHeaders().get("location").get(0), is(format("http://localhost/%d", offerId)));   // uses the offer id in the location header
     }
 }
