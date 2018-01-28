@@ -132,3 +132,5 @@ As well as having unit tests, I have written some cucumber tests also. Namely:
 
 Currently only APIs 1-3 are fully covered by cucumber tests and API test 4 is semi-covered. API 5 (the update) is not covered at all.
 
+I generally run the cucumber tests via intellij.
+
