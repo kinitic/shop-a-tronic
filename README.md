@@ -1,5 +1,6 @@
 # shop-a-tronic
-Spring boot application to add, retrieve and update offers to my shop.
+
+This is a Spring boot application to add, retrieve and update offers to my pretend shop.
 
 To run the application, go the shop-a-tronic/kinitic-shop-api directory and:
 
@@ -11,13 +12,13 @@ run > `./mvnw spring-boot:run`
 
 This will start up the application. 
 
-The application loads 2 currencies at start-up, US Dollars and Pounds. Offers are also associated with the Pounds at this time.
+The application loads 2 currencies at start-up, US Dollars and Pounds. Offers are **only** associated with the Pounds at this time.
 
 All the APIs implemented working across specified currencies, the APIs available:
 
 1. `GET` http://localhost:8080/kinitic-shop/currencies
 
-#####Retrieves all currencies supported by the kinitic shop.
+**Retrieves all currencies supported by the kinitic shop.**
 
 Example response:
 
@@ -43,7 +44,7 @@ The response contains embedded links (HATEOS-style) so the user can drill direct
 
 2. `GET` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers
  
-#####Retrieves all offers associated for the currencyId by the kinitic shop.
+**Retrieves all offers associated for the currencyId by the kinitic shop.**
  
 Example response:
 ````
@@ -76,7 +77,7 @@ Example response:
 
 3. `GET` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers/{offerId}
  
-#####Retrieves offer details for given offerId for given currencyId.
+**Retrieves offer details for given offerId for given currencyId.**
 
 ````
 {
@@ -90,9 +91,9 @@ Example response:
 }
 ````
 
-4. `POST` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers
+**4. `POST` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers**
 
-#####Add an offer for given currencyId.
+Add an offer for given currencyId.
 
 Example payload:
 
@@ -108,7 +109,7 @@ Example payload:
 
 5. `PUT` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers/{offerId}
 
-#####Update an offer resource for given offerId and currencyId.
+**Update an offer resource for given offerId and currencyId.**
 
 Example payload:
 
