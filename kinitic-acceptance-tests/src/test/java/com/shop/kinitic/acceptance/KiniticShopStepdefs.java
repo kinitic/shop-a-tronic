@@ -87,25 +87,25 @@ public class KiniticShopStepdefs {
         readResponse(newClient().target(linksArray[0]).request().get());
     }
 
-    @When("^I click '(.+)' offer link$")
-    public void iClickCuddlyToyOfferLink(final String offerName) throws Throwable {
+    @When("^I click the (.+) '(.+)' offer link$")
+    public void iClickOfferLink(final String offerStatus, final String offerName) throws Throwable {
         final Filter offerFilter = filter(where("name").is(offerName));
 
-        final JSONArray jsonArray = JsonPath.read(responseBody, "$.offers[?].link", offerFilter);
+        final JSONArray jsonArray = JsonPath.read(responseBody, "$."+offerStatus+"Offers[?].link", offerFilter);
         final String[] linksArray = jsonArray.toArray(new String[jsonArray.size()]);     // should only be 1 link matched via the filter
 
         readResponse(newClient().target(linksArray[0]).request().get());
     }
 
-    @Then("^I should see the following offer entries for '(.+)':$")
-    public void iShouldSeeTheFollowingOfferEntries(final String currencyName, final DataTable dataTable) throws Throwable {
+    @Then("^I should see the following '(.+)' offer entries for '(.+)':$")
+    public void iShouldSeeTheFollowingOfferEntries(final String offerStatus, final String currencyName, final DataTable dataTable) throws Throwable {
         with(responseBody)
                 .assertThat("$.name", is(currencyName));
 
         final List<Map<String, String>> expectedOffers = dataTable.asMaps();
 
         with(responseBody)
-                .assertThat("$.offers", hasSize(expectedOffers.size()));
+                .assertThat("$."+offerStatus+"Offers", hasSize(expectedOffers.size()));
 
 
         final List<String> expectedOfferNames = getExpectedDetailsFor("name", expectedOffers); // returns Cuddly Toy, Toaster and Effective Java in list
@@ -119,14 +119,14 @@ public class KiniticShopStepdefs {
                     System.out.println("**** Asserting on offer: " + expectedOfferName);
 
                     assertThat(responseBody, isJson(allOf(
-                            withJsonPath(compile("$.offers[?]", currencyFilter), hasSize(1)),
-                            withJsonPath(compile("$.offers[?].id", currencyFilter), hasItem(parseInt(expectedOfferDetailsMap.get("id")))),
-                            withJsonPath(compile("$.offers[?].name", currencyFilter), hasItem(expectedOfferDetailsMap.get("name"))),
-                            withJsonPath(compile("$.offers[?].category", currencyFilter), hasItem(expectedOfferDetailsMap.get("category"))),
-                            withJsonPath(compile("$.offers[?].startDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("startDate"))),
-                            withJsonPath(compile("$.offers[?].endDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("endDate"))),
-                            withJsonPath(compile("$.offers[?].price", currencyFilter), notNullValue()),  // TODO: fix this assertion.
-                            withJsonPath(compile("$.offers[?].link", currencyFilter), hasItem(expectedOfferDetailsMap.get("link")))
+                            withJsonPath(compile("$."+offerStatus+"Offers[?]", currencyFilter), hasSize(1)),
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].id", currencyFilter), hasItem(parseInt(expectedOfferDetailsMap.get("id")))),
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].name", currencyFilter), hasItem(expectedOfferDetailsMap.get("name"))),
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].category", currencyFilter), hasItem(expectedOfferDetailsMap.get("category"))),
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].startDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("startDate"))),
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].endDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("endDate"))),
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].price", currencyFilter), notNullValue()),  // TODO: fix this assertion.
+                            withJsonPath(compile("$."+offerStatus+"Offers[?].link", currencyFilter), hasItem(expectedOfferDetailsMap.get("link")))
                     )));
                 }
         );
