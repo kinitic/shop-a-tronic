@@ -2,10 +2,10 @@ package com.shop.kinitic.resources;
 
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.model.Offer;
@@ -77,9 +77,31 @@ public class CurrencyResource {
         final Long offerId = offerService.addOffer(currency, offer);
 
         final URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest().path("/{id}")
-                    .buildAndExpand(offerId).toUri();
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(offerId).toUri();
 
         return created(location).build();
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, path = "/{currencyId}/offers/{offerId}")
+    public ResponseEntity<?> updateOffer(@PathVariable final Long currencyId, @PathVariable final Long offerId, @RequestBody final Offer offer) {
+        final Currency currency = currencyService.findCurrencyBy(currencyId);
+
+        if (currency == null) {
+            return noContent().build();
+        }
+
+        final Long updatedOfferId = offerService.updateOffer(currency, offerId, offer);
+
+        if (updatedOfferId == null) {
+            throw new OfferNotFoundException(currency.getName(), offerId);
+        }
+
+        final URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(offerId).toUri();
+
+        return ok(location);
+
     }
 }

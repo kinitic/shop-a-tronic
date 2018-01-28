@@ -9,16 +9,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.Collections;
 
 import com.shop.kinitic.entity.Currency;
 import com.shop.kinitic.entity.OfferDetails;
@@ -30,7 +26,6 @@ import com.shop.kinitic.views.CurrenciesView;
 import com.shop.kinitic.views.CurrencyView;
 import com.shop.kinitic.views.ExpiredOfferView;
 import com.shop.kinitic.views.OfferView;
-import com.sun.jndi.toolkit.url.Uri;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -152,5 +147,49 @@ public class CurrencyResourceTest {
 
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.CREATED));
         assertThat(responseEntity.getHeaders().get("location").get(0), is(format("http://localhost/%d", offerId)));   // uses the offer id in the location header
+    }
+
+    @Test
+    public void shouldNotUpdateOffer_whenUpdatingOfferToAnUnknownCurrency() {
+        final Long unknownCurrencyId = 123L;
+        when(currencyService.findCurrencyBy(unknownCurrencyId)).thenReturn(null);
+
+        final ResponseEntity responseEntity = currencyResource.updateOffer(unknownCurrencyId, 1L, new Offer());
+
+        assertThat(responseEntity, is(ResponseEntity.noContent().build()));
+        verify(currencyService).findCurrencyBy(eq(unknownCurrencyId));
+    }
+
+    @Test(expected = OfferNotFoundException.class)
+    public void shouldThrowException_whenInvokingUpdateOffer_WithUnknownOfferId() {
+        final Long unknownOfferId = 987L;
+
+        final Offer offer = new Offer();
+        final Currency currency = new Currency("GBP", "Pounds Sterling");
+        when(currencyService.findCurrencyBy(123L)).thenReturn(currency);
+        when(offerService.updateOffer(currency, unknownOfferId, offer)).thenReturn(null);
+
+        final ResponseEntity responseEntity = currencyResource.updateOffer(123L, unknownOfferId, offer);
+
+        assertThat(responseEntity, is(ResponseEntity.notFound().build()));
+    }
+
+    @Test
+    public void shouldUpdateOffer_whenUpdatingOffer_happyPath() {
+        final Offer offer = new Offer();
+        final Currency currency = new Currency("GBP", "Pounds Sterling");
+        final long offerIdToUpdate = 987L;
+
+        when(currencyService.findCurrencyBy(123L)).thenReturn(currency);
+        when(offerService.updateOffer(currency, offerIdToUpdate, offer)).thenReturn(offerIdToUpdate);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpSession session = new MockHttpSession();
+        request.setSession(session);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        final ResponseEntity responseEntity = currencyResource.updateOffer(123L, offerIdToUpdate, offer);
+
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
     }
 }

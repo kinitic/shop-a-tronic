@@ -69,6 +69,22 @@ public class OfferService {
         return offerRepository.save(offerDetails).getId();
     }
 
+    public Long updateOffer(final Currency currency, final Long offerId, final Offer offer) {
+        final OfferDetails offerDetails = offerRepository.findByCurrencyAndId(currency, offerId);
+
+        if (offerDetails == null) {
+            return null;
+        }
+        
+        offerDetails.setName(offer.getName());
+        offerDetails.setCategory(offer.getCategory());
+        offerDetails.setStartDate(formatDate(offer.getStartDate()));
+        offerDetails.setExpiryDate(formatDate(offer.getExpiryDate()));
+        offerDetails.setPrice(offer.getPrice());
+
+        return offerRepository.save(offerDetails).getId();
+    }
+
     private LocalDate formatDate(final String date) {
         return parse(date, ofPattern(DATE_PATTERN));
     }

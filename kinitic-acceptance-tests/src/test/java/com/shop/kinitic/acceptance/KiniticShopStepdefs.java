@@ -7,8 +7,11 @@ import static com.jayway.jsonpath.JsonPath.compile;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.isJson;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.withJsonPath;
 import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static javax.json.Json.createObjectBuilder;
 import static javax.ws.rs.client.ClientBuilder.newClient;
+import static javax.ws.rs.client.Entity.json;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
@@ -16,14 +19,21 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
+import com.shop.kinitic.acceptance.model.Offer;
 import cucumber.api.DataTable;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
@@ -91,7 +101,7 @@ public class KiniticShopStepdefs {
     public void iClickOfferLink(final String offerStatus, final String offerName) throws Throwable {
         final Filter offerFilter = filter(where("name").is(offerName));
 
-        final JSONArray jsonArray = JsonPath.read(responseBody, "$."+offerStatus+"Offers[?].link", offerFilter);
+        final JSONArray jsonArray = JsonPath.read(responseBody, "$." + offerStatus + "Offers[?].link", offerFilter);
         final String[] linksArray = jsonArray.toArray(new String[jsonArray.size()]);     // should only be 1 link matched via the filter
 
         readResponse(newClient().target(linksArray[0]).request().get());
@@ -105,8 +115,7 @@ public class KiniticShopStepdefs {
         final List<Map<String, String>> expectedOffers = dataTable.asMaps();
 
         with(responseBody)
-                .assertThat("$."+offerStatus+"Offers", hasSize(expectedOffers.size()));
-
+                .assertThat("$." + offerStatus + "Offers", hasSize(expectedOffers.size()));
 
         final List<String> expectedOfferNames = getExpectedDetailsFor("name", expectedOffers); // returns Cuddly Toy, Toaster and Effective Java in list
 
@@ -119,14 +128,14 @@ public class KiniticShopStepdefs {
                     System.out.println("**** Asserting on offer: " + expectedOfferName);
 
                     assertThat(responseBody, isJson(allOf(
-                            withJsonPath(compile("$."+offerStatus+"Offers[?]", currencyFilter), hasSize(1)),
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].id", currencyFilter), hasItem(parseInt(expectedOfferDetailsMap.get("id")))),
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].name", currencyFilter), hasItem(expectedOfferDetailsMap.get("name"))),
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].category", currencyFilter), hasItem(expectedOfferDetailsMap.get("category"))),
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].startDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("startDate"))),
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].endDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("endDate"))),
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].price", currencyFilter), notNullValue()),  // TODO: fix this assertion.
-                            withJsonPath(compile("$."+offerStatus+"Offers[?].link", currencyFilter), hasItem(expectedOfferDetailsMap.get("link")))
+                            withJsonPath(compile("$." + offerStatus + "Offers[?]", currencyFilter), hasSize(1)),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].id", currencyFilter), hasItem(parseInt(expectedOfferDetailsMap.get("id")))),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].name", currencyFilter), hasItem(expectedOfferDetailsMap.get("name"))),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].category", currencyFilter), hasItem(expectedOfferDetailsMap.get("category"))),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].startDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("startDate"))),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].endDate", currencyFilter), hasItem(expectedOfferDetailsMap.get("endDate"))),
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].price", currencyFilter), notNullValue()),  // TODO: fix this assertion.
+                            withJsonPath(compile("$." + offerStatus + "Offers[?].link", currencyFilter), hasItem(expectedOfferDetailsMap.get("link")))
                     )));
                 }
         );
@@ -155,5 +164,29 @@ public class KiniticShopStepdefs {
 
     private List<String> getExpectedDetailsFor(final String attributeName, final List<Map<String, String>> expectedDetails) {
         return expectedDetails.stream().map(detail -> detail.get(attributeName)).collect(toList());
+    }
+
+    @Given("^I add an offer in the kinitic shop for the '(.+)' currency with the following details:$")
+    public void iAddAnOfferInTheKiniticShop(final String currencyName, final DataTable dataTable) throws Throwable {
+
+        // this works, not pleasant but don't have time to do something nicer
+        String jsonTemplate = "{ \"name\": \"%s\", \"category\": \"%s\", \"startDate\": \"%s\", \"expiryDate\": \"%s\", \"price\": \"%s\" }";
+
+        // TODO: take out the hardcoding of the currencyId
+        WebTarget webTarget = KINITIC_SHOP_API_BASE_URI.path("currencies/2");
+
+        final List<Map<String, String>> offersToAdd = dataTable.asMaps();
+
+        offersToAdd.forEach( offer -> {
+            final String name = offer.get("name");
+            final String category = offer.get("category");
+            final String startDate = offer.get("startDate");
+            final String expiryDate = offer.get("expiryDate");
+            final String price = offer.get("price");
+
+            final String offerAsJson = format(jsonTemplate, name, category, startDate, expiryDate, price);
+            Response response = webTarget.path("offers").request().post(json(offerAsJson));
+            readResponse(response);
+        });
     }
 }

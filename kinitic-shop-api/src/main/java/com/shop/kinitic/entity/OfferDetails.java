@@ -64,4 +64,24 @@ public class OfferDetails {
     public BigDecimal getPrice() {
         return price;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 }
