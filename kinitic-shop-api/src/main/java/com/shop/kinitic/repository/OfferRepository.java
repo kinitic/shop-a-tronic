@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface OfferRepository extends JpaRepository<OfferDetails, Long> {
     List<OfferDetails> findByCurrency(final Currency currency);
 
+    OfferDetails findByCurrencyAndId(final Currency currency, final Long offerId);
 }

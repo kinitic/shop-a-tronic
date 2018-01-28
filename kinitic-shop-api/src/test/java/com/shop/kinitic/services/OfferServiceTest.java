@@ -8,6 +8,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,11 +43,6 @@ public class OfferServiceTest {
     @Captor
     private ArgumentCaptor<Currency> currencyArgumentCaptor;
 
-    @After
-    public void tearDown() {
-        verifyCurrencyInvocations();
-    }
-
     @Test
     public void shouldReturnEmptyListForCurrency_thatHasNoAssociatedOffers() {
         when(offerRepository.findByCurrency(any(Currency.class))).thenReturn(emptyList());
@@ -52,6 +50,7 @@ public class OfferServiceTest {
         assertThat(offerService.getAllOffersFor(new Currency("GBP", "British Pounds")), empty());
 
         verify(offerRepository).findByCurrency(currencyArgumentCaptor.capture());
+        verifyCurrencyInvocations();
     }
 
     @Test
@@ -71,6 +70,40 @@ public class OfferServiceTest {
         assertThat(offersView.get(0).getPrice(), is(BigDecimal.valueOf(2.99)));
 
         verify(offerRepository).findByCurrency(currencyArgumentCaptor.capture());
+        verifyCurrencyInvocations();
+    }
+
+    @Test
+    public void shouldReturnMatchedOfferForSpecificCurrencyAndOffer() {
+        final Currency currency = mock(Currency.class);
+
+        final OfferDetails offerDetails = mock(OfferDetails.class);
+
+        when(offerRepository.findByCurrencyAndId(currency, 123L)).thenReturn(offerDetails);
+        when(currency.getId()).thenReturn(987L);
+
+        when(offerDetails.getId()).thenReturn(123L);
+        when(offerDetails.getName()).thenReturn("offerName");
+        when(offerDetails.getCategory()).thenReturn("category");
+        when(offerDetails.getStartDate()).thenReturn(LocalDate.of(2016, 1, 1));
+        when(offerDetails.getExpiryDate()).thenReturn(LocalDate.of(2017, 1, 1));
+        when(offerDetails.getPrice()).thenReturn(BigDecimal.valueOf(12.99));
+
+        final OfferView offerView = offerService.getOfferFor(currency, 123L);
+
+        assertThat(offerView.getId(), is(123L));
+        
+        verify(offerRepository).findByCurrencyAndId(any(Currency.class), eq(123L));
+        verifyOfferDetails(offerDetails);
+    }
+
+    private void verifyOfferDetails(OfferDetails offerDetails) {
+        verify(offerDetails, times(2)).getId();
+        verify(offerDetails).getName();
+        verify(offerDetails).getCategory();
+        verify(offerDetails).getStartDate();
+        verify(offerDetails).getExpiryDate();
+        verify(offerDetails).getPrice();
     }
 
     private void verifyCurrencyInvocations() {

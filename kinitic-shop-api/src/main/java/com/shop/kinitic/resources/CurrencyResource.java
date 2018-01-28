@@ -41,9 +41,20 @@ public class CurrencyResource {
         if (currency == null) {
             throw new CurrencyNotFoundException(currencyId);
         }
-        
+
         final List<OfferView> offers = offerService.getAllOffersFor(currency);
 
         return new OffersView(currency.getName(), offers);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/{currencyId}/offers/{offerId}")
+    public OfferView getOffer(@PathVariable final Long currencyId, @PathVariable final Long offerId) {
+
+        final Currency currency = currencyService.findCurrencyBy(currencyId);
+        if (currency == null) {
+            throw new CurrencyNotFoundException(currencyId);
+        }
+
+        return offerService.getOfferFor(currency, offerId);
     }
 }

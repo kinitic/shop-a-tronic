@@ -28,4 +28,10 @@ public class OfferService {
                 .map(offer -> new OfferView(offer, currency.getId()))
                 .collect(toList());
     }
+
+    public OfferView getOfferFor(final Currency currency, final Long offerId) {
+        final OfferDetails offerDetails = offerRepository.findByCurrencyAndId(currency, offerId);
+
+        return new OfferView(offerDetails, currency.getId());
+    }
 }
