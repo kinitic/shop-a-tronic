@@ -4,7 +4,7 @@ This is a Spring boot application to add, retrieve and update offers to my prete
 
 To run the application, go the shop-a-tronic/kinitic-shop-api directory and:
 
-run > `./mvnw clean test` 
+run > `./mvnw clean install` 
 
 This will run all the unit tests and make sures that the artefacts required are downloaded.
 
@@ -12,7 +12,7 @@ run > `./mvnw spring-boot:run`
 
 This will start up the application. 
 
-The application loads 2 currencies at start-up, US Dollars and Pounds. Offers are **only** associated with the Pounds at this time.
+The application loads 2 currencies at start-up, US Dollars and Pounds. Offers are **only** associated with the Pounds at start-up.
 
 All the APIs implemented working across specified currencies, the APIs available:
 
