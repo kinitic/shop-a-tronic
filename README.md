@@ -40,7 +40,7 @@ Example response:
     ]
 }
 ````
-The response contains embedded links (HATEOS-style) so the user can drill directly into the currency offers.
+The response contains embedded links (HATEAOS-style) so the user can drill directly into the currency offers.
 
 2. `GET` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers
  
@@ -91,9 +91,9 @@ Example response:
 }
 ````
 
-**4. `POST` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers**
+4. `POST` http://localhost:8080/kinitic-shop/currencies/{currencyId}/offers
 
-Add an offer for given currencyId.
+**Add an offer for given currencyId.**
 
 Example payload:
 
